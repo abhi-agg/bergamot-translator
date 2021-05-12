@@ -88,6 +88,11 @@ En consecuencia, durante el año 2011 se introdujeron 180 proyectos de ley que r
     // Vocab files are re-used in both translation directions
     const vocabLanguagePair = from === "en" ? `${to}${from}` : languagePair;
 
+    let gemmPrecision = "int8shiftAlphaAll";
+    if (languagePair === "ende") {
+      gemmPrecision = "int8shift";
+    }
+
     // Set the Model Configuration as YAML formatted string.
     // For available configuration options, please check: https://marian-nmt.github.io/docs/cmd/marian-decoder/
     /*const modelConfig = `models:
@@ -124,7 +129,7 @@ skip-cost: true
 cpu-threads: 0
 quiet: true
 quiet-translation: true
-gemm-precision: int8shift
+gemm-precision: ${gemmPrecision}
 `;
 
 // TODO: Use in model config when wormhole is enabled:
