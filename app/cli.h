@@ -131,6 +131,8 @@ void native(Ptr<Options> options) {
   std::string input = std_input.str();
 
   ResponseOptions responseOptions;
+  responseOptions.alignment = true;
+  responseOptions.alignmentThreshold = 0.2f;
 
   // Wait on future until Response is complete
   std::promise<Response> responsePromise;
@@ -141,7 +143,26 @@ void native(Ptr<Options> options) {
   responseFuture.wait();
   Response response = responseFuture.get();
 
+  std::cout << response.source.text;
   std::cout << response.target.text;
+
+  // Should response.size() == response.alignments.size() ?
+  std::cout << "No. of Sentence Entries: " << response.size() << std::endl;
+  std::cout << "No. of Alignment Entries: " << response.alignments.size() << std::endl;
+
+  const auto &alignments = response.alignments;
+  for (size_t sentenceIdx = 0; sentenceIdx < response.size(); sentenceIdx++) {
+    const auto& alignment = alignments[sentenceIdx];
+    std::cout << "No. of alignment entries of Sentence" << sentenceIdx << " = " << alignment.size() << std::endl;
+    for (const auto& point : alignment) {
+      //std::cout << " " << point.src << "," << point.tgt << "," << point.prob << std::endl;
+      const auto& srcWordByteRange = response.source.wordAsByteRange(sentenceIdx, point.src);
+      const auto& tgtWordByteRange = response.target.wordAsByteRange(sentenceIdx, point.tgt);
+      std::cout << " [" << srcWordByteRange.begin << "," << srcWordByteRange.end << ") -> [" << tgtWordByteRange.begin << "," << tgtWordByteRange.end << ")" << std::endl;
+      std::cout << " " << response.source.text.substr(srcWordByteRange.begin, srcWordByteRange.size()) << "->" << response.target.text.substr(tgtWordByteRange.begin, tgtWordByteRange.size()) << ":" << point.prob << std::endl;
+    }
+    std::cout << std::endl;
+  }
 }
 
 }  // namespace app
