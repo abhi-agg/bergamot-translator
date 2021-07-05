@@ -152,6 +152,9 @@ void native(Ptr<Options> options) {
 
   const auto &alignments = response.alignments;
   for (size_t sentenceIdx = 0; sentenceIdx < response.size(); sentenceIdx++) {
+    const auto& srcSentenceByteRange = response.source.sentenceAsByteRange(sentenceIdx);
+    const auto& tgtSentenceByteRange = response.target.sentenceAsByteRange(sentenceIdx);
+    std::cout << response.source.text.substr(srcSentenceByteRange.begin, srcSentenceByteRange.size()) << "->" << response.target.text.substr(tgtSentenceByteRange.begin, tgtSentenceByteRange.size()) << std::endl;
     const auto& alignment = alignments[sentenceIdx];
     std::cout << "No. of alignment entries of Sentence" << sentenceIdx << " = " << alignment.size() << std::endl;
     for (const auto& point : alignment) {
