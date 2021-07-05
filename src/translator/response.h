@@ -65,6 +65,18 @@ struct Response {
   /// to (sub-)words accessible through Annotation.
   std::vector<Alignment> alignments;
 
+  const std::vector<std::pair<ByteRange,ByteRange>> getSentenceAlignments() const {
+    std::vector<std::pair<ByteRange,ByteRange>> sentenceAlignments;
+    for (size_t sentenceIdx = 0; sentenceIdx < source.numSentences(); sentenceIdx++) {
+      const auto& srcSentenceByteRange = source.sentenceAsByteRange(sentenceIdx);
+      const auto& tgtSentenceByteRange = target.sentenceAsByteRange(sentenceIdx);
+      sentenceAlignments.emplace_back(std::pair<ByteRange,ByteRange>(srcSentenceByteRange, tgtSentenceByteRange));
+      //std::cout << " [" << srcWordByteRange.begin << "," << srcWordByteRange.end << ") -> [" << tgtWordByteRange.begin << "," << tgtWordByteRange.end << ")" << std::endl;
+      //std::cout << " " << response.source.text.substr(srcWordByteRange.begin, srcWordByteRange.size()) << "->" << response.target.text.substr(tgtWordByteRange.begin, tgtWordByteRange.size()) << ":" << point.prob << std::endl;
+    }
+    return sentenceAlignments;
+  }
+
   const std::string &getOriginalText() const { return source.text; }
 
   const std::string &getTranslatedText() const { return target.text; }
