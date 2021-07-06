@@ -5,18 +5,11 @@
 #include <utility>
 #include <vector>
 
+#include "definitions.h"
 #include "data/types.h"
 
 namespace marian {
 namespace bergamot {
-
-/// ByteRange stores indices for half-interval [begin, end) in a string. Can be
-/// used to represent a sentence, word.
-struct ByteRange {
-  size_t begin;
-  size_t end;
-  const size_t size() const { return end - begin; }
-};
 
 /// Annotation expresses sentence and token boundary information as ranges of
 /// bytes in a string, but does not itself own the string.
