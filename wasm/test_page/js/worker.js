@@ -249,13 +249,13 @@ const _translateInvolvingEnglish = (from, to, input) => {
   const listSourceText = _parseSourceText(vectorResponse);
   const listTranslatedTextSentences = _parseTranslatedTextSentences(vectorResponse);
   const listSourceTextSentences = _parseSourceTextSentences(vectorResponse);
-  const listTranslatedTextSentenceQualityScores = _parseTranslatedTextSentenceQualityScores(vectorResponse);
+  //const listTranslatedTextSentenceQualityScores = _parseTranslatedTextSentenceQualityScores(vectorResponse);
 
   log(`Source text: ${listSourceText}`);
   log(`Translated text: ${listTranslatedText}`);
   log(`Translated sentences: ${JSON.stringify(listTranslatedTextSentences)}`);
   log(`Source sentences: ${JSON.stringify(listSourceTextSentences)}`);
-  log(`Translated sentence quality scores: ${JSON.stringify(listTranslatedTextSentenceQualityScores)}`);
+  //log(`Translated sentence quality scores: ${JSON.stringify(listTranslatedTextSentenceQualityScores)}`);
 
   // Delete prepared SourceText to avoid memory leak
   vectorSourceText.delete();
@@ -338,7 +338,7 @@ const _parseTranslatedTextSentenceQualityScores = (vectorResponse) => {
 }
 
 const _prepareResponseOptions = () => {
-  return {qualityScores: true, alignment: true, html: true};
+  return {qualityScores: false, alignment: false, html: false};
 }
 
 const _prepareSourceText = (input) => {
