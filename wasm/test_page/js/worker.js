@@ -176,11 +176,12 @@ max-length-break: 128
 mini-batch-words: 1024
 workspace: 128
 max-length-factor: 2.0
-skip-cost: true
+skip-cost: false
 cpu-threads: 0
 quiet: true
 quiet-translation: true
-gemm-precision: int8shiftAll
+gemm-precision: int8shiftAlphaAll
+alignment: soft
 `;
 
   const modelFile = `${rootURL}/${languagePair}/${modelRegistry[languagePair]["model"].name}`;
