@@ -39,9 +39,10 @@ onmessage = async function(e) {
       let start = Date.now();
       let from = e.data[1];
       let to = e.data[2];
+      let modelOptions = e.data[3];
       try {
         await constructTranslationService();
-        await constructTranslationModel(from, to);
+        await constructTranslationModel(from, to, modelOptions);
         log(`Model '${from}${to}' successfully constructed. Time taken: ${(Date.now() - start) / 1000} secs`);
         result = "Model successfully loaded";
       } catch (error) {
@@ -86,7 +87,7 @@ const constructTranslationService = async () => {
 }
 
 // Constructs translation model for the source and target language pair.
-const constructTranslationModel = async (from, to) => {
+const constructTranslationModel = async (from, to, modelOptions) => {
   // Delete all previously constructed translation models and clear the map
   languagePairToTranslationModels.forEach((value, key) => {
     log(`Destructing model '${key}'`);
@@ -98,12 +99,12 @@ const constructTranslationModel = async (from, to) => {
   log(`Constructing translation model(s): ${languagePairs.toString()}`);
   if (languagePairs.length == 2) {
     // This implies pivoting is required => Construct 2 translation models
-    await Promise.all([_constructTranslationModelHelper(languagePairs[0]),
-                      _constructTranslationModelHelper(languagePairs[1])]);
+    await Promise.all([_constructTranslationModelHelper(languagePairs[0], modelOptions),
+                      _constructTranslationModelHelper(languagePairs[1], modelOptions)]);
   }
   else {
     // This implies pivoting is not required => Construct 1 translation model
-    await _constructTranslationModelHelper(languagePairs[0]);
+    await _constructTranslationModelHelper(languagePairs[0], modelOptions);
   }
 }
 
@@ -145,7 +146,7 @@ const translate = (from, to, input, translateOptions) => {
   log(`Source sentences: ${JSON.stringify(listSourceTextSentences)}`);
   log(`Translated sentence quality scores: ${JSON.stringify(listTranslatedTextSentenceQualityScores)}`);
 
-  // Delete prepared SourceText to avoid memory leak
+  // Delete prepared SourceText and ResponseOptions to avoid memory leak
   vectorSourceText.delete();
   vectorResponseOptions.delete();
 
@@ -173,13 +174,14 @@ const _prepareAlignedMemoryFromBuffer = async (buffer, alignmentSize) => {
   return alignedMemory;
 }
 
-const _constructTranslationModelHelper = async (languagePair) => {
+const _constructTranslationModelHelper = async (languagePair, modelOptions) => {
 
   /*Set the Model Configuration as YAML formatted string.
     For available configuration options, please check: https://marian-nmt.github.io/docs/cmd/marian-decoder/
     Vocab files are re-used in both translation directions.
     DO NOT CHANGE THE SPACES BETWEEN EACH ENTRY OF CONFIG
   */
+  const modelConfigValueForQE = !modelOptions["withQualityEstimate"];
   const modelConfig = `beam-size: 1
 normalize: 1.0
 word-penalty: 0
@@ -187,7 +189,7 @@ max-length-break: 128
 mini-batch-words: 1024
 workspace: 128
 max-length-factor: 2.0
-skip-cost: false
+skip-cost: ${modelConfigValueForQE}
 cpu-threads: 0
 quiet: true
 quiet-translation: true

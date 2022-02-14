@@ -74,7 +74,10 @@ const loadModel = () => {
   if (lngFrom !== lngTo) {
     status(`Installing model...`);
     console.log(`Loading model '${lngFrom}${lngTo}'`);
-    worker.postMessage(["load_model", lngFrom, lngTo]);
+    // Additional options (e.g. QE feature) for loading the models
+    const modelOptions = {"withQualityEstimate": true};
+    const withQualityEstimate = true;
+    worker.postMessage(["load_model", lngFrom, lngTo, modelOptions]);
   } else {
     const input = document.querySelector("#input").value;
     document.querySelector("#output").value = input;
