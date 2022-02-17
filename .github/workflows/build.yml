@@ -325,6 +325,12 @@ jobs:
           working-directory: build-wasm-without-wormhole
           run: bash ../wasm/patch-artifacts-import-gemm-module.sh
 
+        - name: Compute sha256 and file size of artifacts
+          working-directory: build-wasm-without-wormhole
+          run: |
+            shasum -a 256 bergamot-translator-worker.js bergamot-translator-worker.wasm >> WASM-SHA256-FILESIZE
+            wc -c bergamot-translator-worker.js bergamot-translator-worker.wasm >> WASM-SHA256-FILESIZE
+
 
         # WORMHOLE=on
         - name: "Configure builds for WORMHOLE=on"
@@ -356,9 +362,13 @@ jobs:
           working-directory: build-wasm-with-wormhole
           run: |
                 mv bergamot-translator-worker{,-with-wormhole}.js
-                mv bergamot-translator-worker{,-with-wormhole}.js.bak
                 mv bergamot-translator-worker{,-with-wormhole}.wasm
 
+        - name: Compute sha256 and file size of artifacts
+          working-directory: build-wasm-with-wormhole
+          run: |
+            shasum -a 256 bergamot-translator-worker-with-wormhole.js bergamot-translator-worker-with-wormhole.wasm >> WASM-WORMHOLE-SHA256-FILESIZE
+            wc -c bergamot-translator-worker-with-wormhole.js bergamot-translator-worker-with-wormhole.wasm >> WASM-WORMHOLE-SHA256-FILESIZE
 
         # Upload both together.
         - name: Upload wasm artifact
@@ -370,11 +380,11 @@ jobs:
                 # Without wormhole
                 ${{github.workspace}}/build-wasm-without-wormhole/bergamot-translator-worker.js
                 ${{github.workspace}}/build-wasm-without-wormhole/bergamot-translator-worker.wasm
-                ${{github.workspace}}/build-wasm-without-wormhole/bergamot-translator-worker.js.bak
+                ${{github.workspace}}/build-wasm-without-wormhole/WASM-SHA256-FILESIZE
 
                 ${{github.workspace}}/build-wasm-with-wormhole/bergamot-translator-worker-with-wormhole.js
                 ${{github.workspace}}/build-wasm-with-wormhole/bergamot-translator-worker-with-wormhole.wasm
-                ${{github.workspace}}/build-wasm-with-wormhole/bergamot-translator-worker-with-wormhole.js.bak
+                ${{github.workspace}}/build-wasm-with-wormhole/WASM-WORMHOLE-SHA256-FILESIZE
 
   # Try to upload a release using https://github.com/marvinpinto/actions/issues/177#issuecomment-917605585 as a model
     release-latest:
@@ -397,8 +407,11 @@ jobs:
                 artifact/*.whl
                 wasm-artefacts/build-wasm-without-wormhole/bergamot-translator-worker.js
                 wasm-artefacts/build-wasm-without-wormhole/bergamot-translator-worker.wasm
+                wasm-artefacts/build-wasm-without-wormhole/WASM-SHA256-FILESIZE
                 wasm-artefacts/build-wasm-with-wormhole/bergamot-translator-worker-with-wormhole.js
                 wasm-artefacts/build-wasm-with-wormhole/bergamot-translator-worker-with-wormhole.wasm
+                wasm-artefacts/build-wasm-with-wormhole/WASM-WORMHOLE-SHA256-FILESIZE
+
   
     release-version:
       name: Release version 
@@ -424,8 +437,10 @@ jobs:
                 artifact/*.whl
                 wasm-artefacts/build-wasm-without-wormhole/bergamot-translator-worker.js
                 wasm-artefacts/build-wasm-without-wormhole/bergamot-translator-worker.wasm
+                wasm-artefacts/build-wasm-without-wormhole/WASM-SHA256-FILESIZE
                 wasm-artefacts/build-wasm-with-wormhole/bergamot-translator-worker-with-wormhole.js
                 wasm-artefacts/build-wasm-with-wormhole/bergamot-translator-worker-with-wormhole.wasm
+                wasm-artefacts/build-wasm-with-wormhole/WASM-WORMHOLE-SHA256-FILESIZE
 
   
     python-checks:
